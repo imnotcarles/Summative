@@ -37,10 +37,31 @@ public class PrimaryController {
     private MenuItem verticalFlip;
 
     @FXML
-    private MenuItem onRotation;
+    private MenuItem rotation;
 
     @FXML
     private MenuItem grayScale;
+
+    @FXML
+    private MenuItem sepiaTone;
+
+    @FXML
+    private MenuItem invertColor;
+
+    @FXML
+    private MenuItem brightness;
+
+    @FXML
+    private MenuItem bulge;
+
+    @FXML
+    private MenuItem colorOverlay;
+
+    @FXML
+    private MenuItem pixelation;
+
+    @FXML
+    private MenuItem vignette;
 
     @FXML
     void onOpenImage(ActionEvent event) {
@@ -112,9 +133,9 @@ public class PrimaryController {
         PixelReader reader = imageView.getImage().getPixelReader();
         PixelWriter writer = writableImage.getPixelWriter();
 
-        for (int j = 0; j < width; j++) {
-            for (int i = 0; i < height; i++) {
-                writer.setColor(width, height - i - 1, reader.getColor(i, j));
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                writer.setColor(i, height - j - 1, reader.getColor(i, j));
             }
         }
         imageView.setImage(writableImage);
@@ -137,13 +158,14 @@ public class PrimaryController {
         imageView.setImage(writableImage);
     }
 
-    @FXML
+    /* @FXML
     void onGrayscale(ActionEvent event) {
         PixelReader reader = imageView.getImage().getPixelReader();
         PixelWriter writer = writableImage.getPixelWriter();
         Color color = reader.getColor
         Color newColor = new Color(color.getRed() * 0.21, color.getGreen() * 0.71, color.getBlue() * 0.07);
     }
+     */
 
     /*
      * Accessing a pixels colors
