@@ -208,9 +208,9 @@ public class PrimaryController {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Color color = reader.getColor(i, j);
-                double r = Math.min(1.0, 0.393 * color.getRed() + 0.769 * color.getGreen() + 0.189 * color.getBlue());
-                double g = Math.min(1.0, 0.349 * color.getRed() + 0.686 * color.getGreen() + 0.168 * color.getBlue());
-                double b = Math.min(1.0, 0.272 * color.getRed() + 0.534 * color.getGreen() + 0.131 * color.getBlue());
+                double r = Math.min(1, 0.393 * color.getRed() + 0.769 * color.getGreen() + 0.189 * color.getBlue());
+                double g = Math.min(1, 0.349 * color.getRed() + 0.686 * color.getGreen() + 0.168 * color.getBlue());
+                double b = Math.min(1, 0.272 * color.getRed() + 0.534 * color.getGreen() + 0.131 * color.getBlue());
                 writer.setColor(i, j, new Color(r, g, b, color.getOpacity()));
             }
         }
@@ -254,9 +254,9 @@ public class PrimaryController {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Color color = reader.getColor(i, j);
-                double r = Math.min(1.0, color.getRed() + brightnessFactor);
-                double g = Math.min(1.0, color.getGreen() + brightnessFactor);
-                double b = Math.min(1.0, color.getBlue() + brightnessFactor);
+                double r = Math.min(1, color.getRed() + brightnessFactor);
+                double g = Math.min(1, color.getGreen() + brightnessFactor);
+                double b = Math.min(1, color.getBlue() + brightnessFactor);
                 writer.setColor(i, j, new Color(r, g, b, color.getOpacity()));
             }
         }
@@ -284,12 +284,12 @@ public class PrimaryController {
                 double r = Math.sqrt(dx * dx + dy * dy);
                 double angle = Math.atan2(dy, dx);
 
-                double rPrime = r * p / (s + r);
-                int newX = (int) Math.round(cx + rPrime * Math.cos(angle));
-                int newY = (int) Math.round(cy + rPrime * Math.sin(angle));
+                double rPrime = r * p / s;
+                int x = (int) Math.round(cx + rPrime * Math.cos(angle));
+                int y = (int) Math.round(cy + rPrime * Math.sin(angle));
 
-                if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
-                    writer.setColor(i, j, reader.getColor(newX, newY));
+                if (x >= 0 && x < width && y >= 0 && y < height) {
+                    writer.setColor(i, j, reader.getColor(x, y));
                 } else {
                     writer.setColor(i, j, Color.BLACK);
                 }
@@ -312,10 +312,8 @@ public class PrimaryController {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Color color = reader.getColor(i, j);
-                double r = (color.getRed() + overlay.getRed()) / 2.0;
-                double g = (color.getGreen() + overlay.getGreen()) / 2.0;
-                double b = (color.getBlue() + overlay.getBlue()) / 2.0;
-                writer.setColor(i, j, new Color(r, g, b, color.getOpacity()));
+                color.interpolate(overlay, 0.50);
+                writer.setColor(i, j, color);
             }
         }
 
@@ -335,12 +333,12 @@ public class PrimaryController {
         for (int i = 0; i < width; i += blockSize) {
             for (int j = 0; j < height; j += blockSize) {
                 Color color = reader.getColor(i, j);
-                for (int dx = 0; dx < blockSize; dx++) {
-                    for (int dy = 0; dy < blockSize; dy++) {
-                        int px = i + dx;
-                        int py = j + dy;
-                        if (px < width && py < height) {
-                            writer.setColor(px, py, color);
+                for (int x = 0; x < blockSize; x++) {
+                    for (int y = 0; y < blockSize; y++) {
+                        int newX = i + x;
+                        int newY = j + y;
+                        if (newX < width && newY < height) {
+                            writer.setColor(newX, newY, color);
                         }
                     }
                 }
@@ -354,8 +352,8 @@ public class PrimaryController {
     void onVignette(ActionEvent event) {
         int width = (int) imageView.getImage().getWidth();
         int height = (int) imageView.getImage().getHeight();
-        double cx = width / 2.0;
-        double cy = height / 2.0;
+        double cx = width / 2;
+        double cy = height / 2;
         double maxDistance = Math.sqrt(cx * cx + cy * cy);
         double minFactor = 0.3;
 
@@ -366,14 +364,11 @@ public class PrimaryController {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 double distance = Math.sqrt((i - cx) * (i - cx) + (j - cy) * (j - cy));
-                double factor = 1 - (distance / maxDistance);
-                factor = Math.max(minFactor, factor);
-
+                double brightnessFactor = 1 - (distance / maxDistance);
+                brightnessFactor = Math.clamp(brightnessFactor, minFactor, brightnessFactor);
                 Color color = reader.getColor(i, j);
-                double r = color.getRed() * factor;
-                double g = color.getGreen() * factor;
-                double b = color.getBlue() * factor;
-                writer.setColor(i, j, new Color(r, g, b, color.getOpacity()));
+                color.deriveColor(0, 1, brightnessFactor, 1);
+                writer.setColor(i, j, color);
             }
         }
 
