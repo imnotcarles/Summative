@@ -172,7 +172,6 @@ public class PrimaryController {
                 writer.setColor(j, width - i - 1, reader.getColor(i, j));
             }
         }
-
         imageView.setImage(writableImage);
     }
 
@@ -192,7 +191,6 @@ public class PrimaryController {
                 writer.setColor(i, j, new Color(gray, gray, gray, color.getOpacity()));
             }
         }
-
         imageView.setImage(writableImage);
     }
 
@@ -214,7 +212,6 @@ public class PrimaryController {
                 writer.setColor(i, j, new Color(r, g, b, color.getOpacity()));
             }
         }
-
         imageView.setImage(writableImage);
     }
 
@@ -237,7 +234,6 @@ public class PrimaryController {
                         color.getOpacity()));
             }
         }
-
         imageView.setImage(writableImage);
     }
 
@@ -260,7 +256,6 @@ public class PrimaryController {
                 writer.setColor(i, j, new Color(r, g, b, color.getOpacity()));
             }
         }
-
         imageView.setImage(writableImage);
     }
 
@@ -284,9 +279,9 @@ public class PrimaryController {
                 double r = Math.sqrt(dx * dx + dy * dy);
                 double angle = Math.atan2(dy, dx);
 
-                double rPrime = r * p / s;
-                int x = (int) Math.round(cx + rPrime * Math.cos(angle));
-                int y = (int) Math.round(cy + rPrime * Math.sin(angle));
+                double newR = Math.pow(r, p) / s;
+                int x = (int) Math.round(cx + newR * Math.cos(angle));
+                int y = (int) Math.round(cy + newR * Math.sin(angle));
 
                 if (x >= 0 && x < width && y >= 0 && y < height) {
                     writer.setColor(i, j, reader.getColor(x, y));
@@ -295,7 +290,6 @@ public class PrimaryController {
                 }
             }
         }
-
         imageView.setImage(writableImage);
     }
 
@@ -312,11 +306,10 @@ public class PrimaryController {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Color color = reader.getColor(i, j);
-                color.interpolate(overlay, 0.50);
-                writer.setColor(i, j, color);
+                Color mixture = color.interpolate(overlay, 0.5);
+                writer.setColor(i, j, mixture);
             }
         }
-
         imageView.setImage(writableImage);
     }
 
@@ -344,7 +337,6 @@ public class PrimaryController {
                 }
             }
         }
-
         imageView.setImage(writableImage);
     }
 
@@ -363,15 +355,14 @@ public class PrimaryController {
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
+                Color color = reader.getColor(i, j);
                 double distance = Math.sqrt((i - cx) * (i - cx) + (j - cy) * (j - cy));
                 double brightnessFactor = 1 - (distance / maxDistance);
                 brightnessFactor = Math.clamp(brightnessFactor, minFactor, brightnessFactor);
-                Color color = reader.getColor(i, j);
-                color.deriveColor(0, 1, brightnessFactor, 1);
-                writer.setColor(i, j, color);
+                Color derived = color.deriveColor(0, 1, brightnessFactor, 1);
+                writer.setColor(i, j, derived);
             }
         }
-
         imageView.setImage(writableImage);
     }
 
