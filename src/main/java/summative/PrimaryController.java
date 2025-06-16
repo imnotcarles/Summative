@@ -286,7 +286,7 @@ public class PrimaryController {
                 if (x >= 0 && x < width && y >= 0 && y < height) {
                     writer.setColor(i, j, reader.getColor(x, y));
                 } else {
-                    writer.setColor(i, j, Color.BLACK);
+                    writer.setColor(i, j, Color.TRANSPARENT);
                 }
             }
         }
@@ -297,7 +297,7 @@ public class PrimaryController {
     void onColorOverlay(ActionEvent event) {
         int width = (int) imageView.getImage().getWidth();
         int height = (int) imageView.getImage().getHeight();
-        Color overlay = new Color(0.5, 0.0, 0.5, 1.0);
+        Color overlay = new Color(0.5, 0.0, 0.5, 0.5);
 
         WritableImage writableImage = new WritableImage(width, height);
         PixelReader reader = imageView.getImage().getPixelReader();
